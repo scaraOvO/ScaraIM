@@ -276,4 +276,3 @@ im.example.com {
 Caddy 负责 HTTPS 和 WebSocket 转发；确保域名解析及 80/443 端口可达。也可用 Nginx，需显式设置 Upgrade/Connection、原始 Host，并把请求大小上限设为至少 21 MiB。不要将数据库或 uploads 目录直接映射为公开静态目录。
 
 使用系统服务管理器运行上述进程并设置自动重启；服务启动参数需使用绝对路径，数据目录归服务用户所有。首次启动后网页注册，再用相同数据目录执行 `scaraim --data-dir /srv/scaraim/data --set-admin 用户名`。升级前停止服务并备份完整数据目录；替换二进制和前端文件后重新启动。
-

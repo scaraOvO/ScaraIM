@@ -1,0 +1,51 @@
+name: Cross-platform checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run build
+        working-directory: frontend
+      - run: cargo fmt --check
+        working-directory: backend
+      - run: cargo build --locked
+        working-directory: backend
+      - run: cargo test --locked
+        working-directory: backend
+      - run: node scripts/platform-checks.mjs
+      - run: node scripts/integration.mjs
+
+  release:
+    name: Publish v0.1.0
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish first source release after all platform checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh release view v0.1.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "v0.1.0 already exists; leaving it unchanged."
+          else
+            gh release create v0.1.0 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "ScaraIM v0.1.0" --notes-file CHANGELOG.md --latest
+          fi

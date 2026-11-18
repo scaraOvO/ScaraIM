@@ -1,0 +1,9 @@
+{
+  "id": "scaraim.about",
+  "command": "about",
+  "admin_only": false,
+  "response": {
+    "name": "ScaraIM",
+    "description": "React + Rust instant messaging"
+  }
+}

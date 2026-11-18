@@ -1,0 +1,14 @@
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+backend/target/
+backend/data/
+.cache/
+*.log
+
+.env
+.env.*
+!.env.example
+*.db
+*.db-wal
+*.db-shm
